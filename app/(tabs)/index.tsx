@@ -1,70 +1,75 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import axios from 'axios';
+import { Image } from 'expo-image';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollViewBase } from 'react-native';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+  const [data, setData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.get('https://plrhwdgw-8000.asse.devtunnels.ms/api/Artikel'); // Menambahkan https:// pada URL
+        setData(response.data.data);
+      } catch (error) {
+        setError('Gagal Mengambil Data');
+        Alert.alert('Error', 'Gagal Mengambil Data');
+      }
+    };
+
+    getData();
+  }, []); 
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <GestureHandlerRootView>
+      <SafeAreaView style={styles.container}>
+      <View style={styles.counterContainer}>
+        <Text style={styles.counterText}>Belajar API</Text>
+      </View>
+      <ScrollView>
+        {data.map((farm, index) => (
+          <View key={index} style={styles.testingContainer}>
+            <Image
+              source={{ uri: farm.image }}
+              // style={styles.image} // Menambahkan style untuk ukuran image
+            />
+            <Text>{farm.judul}</Text>
+            <Text>{farm.content}</Text>
+            <Text>p</Text>
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    padding: 16,
   },
-  stepContainer: {
-    gap: 8,
+  counterContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  counterText: {
+    fontSize: 24,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    marginTop: 16,
+  },
+  mealText: {
+    fontSize: 16,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  testingContainer:{
+    marginBottom: 30
+  }
 });
